@@ -4,7 +4,7 @@ Metric Buttload Encryption Engine
 
 This encryption utility should be used by Unix Admins who need to encrypt backups for long term storage.  It uses the OPENSSL engine which must be installed on the unix machine encrypting or decrypting.
 
-MBEE uses 4 types of encryption to encrypt your files.
+MBEE uses 4 types of encryption to encrypt your files.<br>
 aes-256-cbc<br>
 bf-ecb<br>
 camellia-256-cfb1<br>
