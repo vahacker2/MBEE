@@ -10,7 +10,7 @@ bf-ecb<br>
 camellia-256-cfb1<br>
 aes-192-ecb<br>
 
-MBEE forces 128char passwords on the passwords used to encrypt a file.  The only password the user enters is to unlock the mbee_keystore.
+MBEE forces 128char passwords on the passwords used to encrypt a file.   The only password the user enters is to unlock the mbee_keystore.
 
 08/2018
 Development continues of the engine.
