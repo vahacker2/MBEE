@@ -15,5 +15,5 @@ MBEE forces 128char passwords on the passwords used to encrypt a file.  The only
 08/2018
 Development continues of the engine.
 =======
-Simple encryption utility to help admins securing backups for long storage backups.
+
 >>>>>>> b5b6a6ed19b78d2485d3082284c9fd82cb008bf7
