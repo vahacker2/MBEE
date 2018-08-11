@@ -1,6 +1,6 @@
 # MBEE
 Metric Buttload Encryption Engine
-<<<<<<< HEAD
+
 
 This encryption utility should be used by Unix Admins who need to encrypt backups for long term storage.  It uses the OPENSSL engine which must be installed on the unix machine encrypting or decrypting.
 
