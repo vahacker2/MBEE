@@ -12,11 +12,6 @@ aes-192-ecb<br>
 
 MBEE forces 128char passwords on the passwords used to encrypt a file.   The only password the user enters is to unlock the mbee_keystore.
 
-Installation:
-Download mbee.c source file
-make mbee source file name
-copy mbee into one of your paths
-
 
 08/2018
 Development continues of the engine.
