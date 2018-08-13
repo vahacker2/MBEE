@@ -20,6 +20,8 @@ copy mbee into one of your paths<br>
 - Turned off echo so passwords would not be shown when entered.
 - Improvement to user interface.
 - Zeroed out password variables after use.
-=======
+
+<br>
+<br>=======
 
 >>>>>>> b5b6a6ed19b78d2485d3082284c9fd82cb008bf7
