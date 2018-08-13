@@ -16,8 +16,12 @@ Installation: Download mbee.c source file <br>
 make mbee source file name <br>
 copy mbee into one of your paths<br>
 
-08/2018
-Development continues of the engine.
-=======
+08/12/2018
+- Turned off echo so passwords would not be shown when entered.
+- Improvement to user interface.
+- Zeroed out password variables after use.
+
+<br>
+<br>=======
 
 >>>>>>> b5b6a6ed19b78d2485d3082284c9fd82cb008bf7

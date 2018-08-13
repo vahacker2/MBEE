@@ -1,7 +1,15 @@
+//
+// MBEE v05.2b
+//
+
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
+#include <sgtty.h>
+#include <time.h>
 
 
 void main(int argc, char *argv[])
@@ -11,7 +19,7 @@ void main(int argc, char *argv[])
 if (argc !=4) {
 printf("\n\n");
 
-printf("\nMBEE - Metric Buttload Encryption Engine\n----\n mbee -c <create> to create keys and keystore.\n mbee -e <source_filename> <encrypted_filename> to encrypt a file.\n mbee -d <source_filename> <encrypted_filename> to decrypt a file.\n\n\n");
+printf("\nMBEE - Metric Buttload Encryption Engine\n----\n mbee -c <create> <key> to create keys and keystore.\n mbee -e <source_filename> <encrypted_filename> to encrypt a file.\n mbee -d <source_filename> <encrypted_filename> to decrypt a file.\n\n\n");
 
 exit(1);
 
@@ -22,12 +30,16 @@ if (!strcmp(argv[1], "-c"))
 {
 
     FILE *fp, *fp1;
-
+   
 
      char password[10];
 
+     
+     
      printf("Enter password: ");
+     system("stty -echo");
      scanf("%s",password);
+     system("stty echo");
 
     printf("\n");
     fp1 = fopen("/etc/mbee","r");
@@ -38,7 +50,7 @@ if (!strcmp(argv[1], "-c"))
      system("mount -t tmpfs -o size=3m tmpfs /mnt/mbee_ramdisk");
      sleep(1);
      srand((unsigned int)(time(NULL)));
-
+          
 
           fp = fopen("/mnt/mbee_ramdisk/mbee_keystore", "w");
 
@@ -49,7 +61,7 @@ if (!strcmp(argv[1], "-c"))
                         char characters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
              // CAREFUL what special chars you put in here as they could break the engine.
              // Each password is 400 trillion trillion trillion trillion trillion trillion years to BF hack.  I think this is enough.
-
+             
 
 
 
@@ -70,13 +82,13 @@ if (!strcmp(argv[1], "-c"))
           // Encryption of MBEE Keystore in ramdir then copys it to /etc/mbee directory.
 
       char command[300];
-
+      
       sprintf(command, "openssl aes-256-cbc -e -salt -in /mnt/mbee_ramdisk/mbee_keystore -out /mnt/mbee_ramdisk/mbee_keystore2 -pass pass:%s\n", password);
       system( command );
-
+       
       sprintf(command, "openssl bf-ecb -e -salt -in /mnt/mbee_ramdisk/mbee_keystore2 -out /mnt/mbee_ramdisk/mbee_keystore3 -pass pass:%s\n", password);
       system( command );
-
+     
       sprintf(command, "openssl camellia-256-cfb1 -e -salt -in /mnt/mbee_ramdisk/mbee_keystore3 -out /mnt/mbee_ramdisk/mbee_keystore4 -pass pass:%s\n", password);
       system( command );
 
@@ -97,7 +109,7 @@ if (!strcmp(argv[1], "-c"))
 
 
 //
-// Encryption Function
+// Encryption Function 
 //
   if (!strcmp(argv[1], "-e"))
 {
@@ -107,19 +119,22 @@ if (!strcmp(argv[1], "-c"))
 
 
      char password[10];
-
+     
+     printf("\n");
      printf("Enter password: ");
+     system("stty -echo");
      scanf("%s",password);
-
-
+     system("stty echo");
+     printf("\n");
+     
       char command[300];
-
+      
       sprintf(command, "openssl aes-192-ecb -d -salt -in /mnt/mbee_ramdisk/mbee_keystore -out /mnt/mbee_ramdisk/mbee_keystore2 -pass pass:%s\n",password);
       system( command );
-
+       
       sprintf(command, "openssl camellia-256-cfb1 -d -salt -in /mnt/mbee_ramdisk/mbee_keystore2 -out /mnt/mbee_ramdisk/mbee_keystore3 -pass pass:%s\n", password);
       system( command );
-
+     
       sprintf(command, "openssl bf-ecb -d -salt -in /mnt/mbee_ramdisk/mbee_keystore3 -out /mnt/mbee_ramdisk/mbee_keystore4 -pass pass:%s\n", password);
       system( command );
 
@@ -149,37 +164,39 @@ if (!strcmp(argv[1], "-c"))
         /* get rid of ending \n from fgets */
         line[a][strlen(line[a]) - 1] = '\0';
         a++;
-
-
+        
+    
 }
 
-
-    total = a;
-    for(a = 0; a < total; ++a)
-    printf("%s\n", line[a]);
-    printf("\n");
-
+   
    fclose(plist);
    system("umount /mnt/mbee_ramdisk/");
 
-
+    
 
     char command2[300];
-
+    
     char *in_name=argv[2];
     char *out_name="aaa.enc";
     char *pass="pass:";
     char *fname=argv[3];
+    
+   // clock_t begin = clock();
 
-
+    time_t start_time = 0;
+    time_t end_time = 0;   
+    time_t elapsed_time=0;
+    time_t elapsed_mins=0;
+     
+    start_time = time(NULL);
+        
     sprintf(command2, "openssl aes-192-ecb -e -salt -in %s -out %s -pass pass:%s\n", in_name, out_name, line[0]);
     system( command2 );
-    printf(command2);
-
+    
     sprintf(command2, "mv  %s tempenc.mbee\n", out_name);
     system( command2 );
-
-    printf("Encrypting with : aes-192-ecb\n");
+    
+    printf("\nEncrypting with : aes-192-ecb\n");
 
     sprintf(command2, "openssl bf-ecb  -salt -in tempenc.mbee -out %s  -pass pass:%s\n", out_name, line[1]);
     system( command2 );
@@ -191,6 +208,7 @@ if (!strcmp(argv[1], "-c"))
 
     sprintf(command2, "openssl camellia-256-cfb1  -salt -in tempenc.mbee -out %s -pass pass:%s\n", out_name, line[2]);
     system( command2 );
+    
     sprintf(command2, "mv  %s tempenc.mbee\n", out_name);
     system( command2 );
 
@@ -199,13 +217,27 @@ if (!strcmp(argv[1], "-c"))
 
     sprintf(command2, "openssl aes-256-cbc  -salt -in tempenc.mbee -out %s -pass pass:%s\n", out_name, line[3]);
     system( command2 );
-
+    
     sprintf(command2, "mv  %s %s\n", out_name, fname);
     system( command2 );
     system(" rm tempenc.mbee");
-
-
+    
+        
     printf("Encrypting with : aes-256-cbc\n\n");
+
+    
+    char *password="0";
+    end_time=time(NULL);
+    elapsed_time= end_time - start_time;
+    elapsed_mins= elapsed_time / 60;    
+    
+    printf("Time to Encrypt: %i seconds\n", elapsed_time);
+    printf("Time to Encrypt: %i minutes\n", elapsed_mins);
+    printf("\n");
+    
+        
+//    clock_t end = clock();
+//    printf("Elapsed: %f seconds\n", (double) (end - begin));
 
 }
 }
@@ -224,19 +256,23 @@ if (!strcmp(argv[1], "-c"))
       system("cp /etc/mbee/mbee_keystore /mnt/mbee_ramdisk/mbee_keystore");
 
      char password[10];
-
+     
+     
+     
      printf("Enter password: ");
+     system("stty -echo");
      scanf("%s",password);
-
+     system("stty echo");
+     printf("\n");
 
       char command[300];
-
+      
       sprintf(command, "openssl aes-192-ecb -d -salt -in /mnt/mbee_ramdisk/mbee_keystore -out /mnt/mbee_ramdisk/mbee_keystore2 -pass pass:%s\n",password);
       system( command );
-
+       
       sprintf(command, "openssl camellia-256-cfb1 -d -salt -in /mnt/mbee_ramdisk/mbee_keystore2 -out /mnt/mbee_ramdisk/mbee_keystore3 -pass pass:%s\n", password);
       system( command );
-
+     
       sprintf(command, "openssl bf-ecb -d -salt -in /mnt/mbee_ramdisk/mbee_keystore3 -out /mnt/mbee_ramdisk/mbee_keystore4 -pass pass:%s\n", password);
       system( command );
 
@@ -267,66 +303,83 @@ if (!strcmp(argv[1], "-c"))
         /* get rid of ending \n from fgets */
         line[a][strlen(line[a]) - 1] = '\0';
         a++;
-
-
+        
+    
 }
 
-
-    total = a;
-    for(a = 0; a < total; ++a)
-    printf("%s\n", line[a]);
-    printf("\n");
+   
 
    fclose(plist);
    system("umount /mnt/mbee_ramdisk/");
 
-
+    
 
     char command2[300];
-
+    
     char *in_name=argv[2];
     char *out_name="aaa.enc";
     char *pass="pass:";
     char *fname=argv[3];
+    time_t start_time = 0;
+    time_t end_time = 0;
+    time_t elapsed_time=0;
+    time_t elapsed_mins=0;
 
+    start_time = time(NULL);
+
+
+
+    printf("Decrypting aes-256-cbc\n");
+        
     sprintf(command2, "openssl aes-256-cbc -d -salt -in %s -out %s -pass pass:%s\n", in_name, out_name, line[3]);
     system( command2 );
     sprintf(command2, "mv  %s tempenc.mbee\n", out_name);
     system( command2 );
+    
+    printf("Decrypting camellia-256-cfb1\n");
 
-    printf("Round 1\n");
 
     sprintf(command2, "openssl camellia-256-cfb1 -d  -salt -in tempenc.mbee -out %s -pass pass:%s\n", out_name, line[2]);
     system( command2 );
     sprintf(command2, "mv  %s tempenc.mbee\n", out_name);
     system( command2 );
 
-    printf("Round 2\n");
+    printf("Decrypting bf-ecb\n");
+
 
     sprintf(command2, "openssl bf-ecb -d -salt -in tempenc.mbee -out %s -pass pass:%s\n", out_name, line[1]);
-    system( command2 );
+    system( command2 );		
     sprintf(command2, "mv  %s tempenc.mbee\n", out_name);
     system( command2 );
 
-    printf("Round 3\n");
-
+    printf("Decrypting aes-192-ecb\n");
 
     sprintf(command2, "openssl aes-192-ecb -d  -salt -in tempenc.mbee -out %s -pass pass:%s\n", out_name, line[0]);
     system( command2 );
-
+    
     sprintf(command2, "mv  %s %s\n", out_name, fname);
     system( command2 );
     system(" rm tempenc.mbee");
+    
+        
 
+    char *password="0";
+    
+    end_time=time(NULL);
+    elapsed_time= end_time - start_time;
+    elapsed_mins= elapsed_time / 60;
 
-    printf("Round4\n");
+    printf("Time to Encrypt: %i seconds\n", elapsed_time);
+    printf("Time to Encrypt: %i minutes\n", elapsed_mins);
+    printf("\n");
+    
 
 
 
 }
-
-// More dev here.
-
+      
+// More dev here.      
+  
 
 }
 
@@ -343,3 +396,4 @@ exit(1);
 // More Dev here.
 
 }
+
